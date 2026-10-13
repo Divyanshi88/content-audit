@@ -12,6 +12,9 @@ Env vars:
   IG_COOKIES_FROM     local alternative: firefox|chrome|safari, reuse that browser's instagram.com login
   IG_SESSION_USER     local alternative: username saved with `instaloader --login`
   MAX_POSTS           posts to read per account (default: 80)
+  USE_AI              0 = free mode: metrics + quick insights only, no Claude calls
+  GITHUB_TOKEN        fine-grained token (Contents read/write on this repo) so audits survive restarts
+  GITHUB_REPO         owner/name of this repo, e.g. Divyanshi88/content-audit
   VIDEO_ANALYSIS      1 = download reels, transcribe audio, send frames to Claude (slower; for laptops)
 
 For personal use put these in a .env file next to this script (see .env.example).
@@ -46,7 +49,7 @@ from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
-from iga import pipeline
+from iga import pipeline, store
 from iga.report import STYLE, compact
 
 DATA = Path(os.environ.get("DATA_DIR", "output"))
@@ -129,6 +132,10 @@ def worker():
                          videos=full, transcribe=full, use_ai=os.environ.get("USE_AI", "1") != "0",
                          session_user=os.environ.get("IG_SESSION_USER"), cookies_from=os.environ.get("IG_COOKIES_FROM"))
             job["status"], job["url"] = "done", f"/r/{job['handle']}"
+            try:
+                store.save(job["handle"], DATA / job["handle"])
+            except Exception:  # noqa: BLE001 - the report is still served; it just won't survive a restart
+                traceback.print_exc()
         except Exception as e:  # noqa: BLE001 - surface any failure to the user
             traceback.print_exc()
             job["status"], job["error"] = "error", friendly_error(e)
@@ -182,7 +189,7 @@ def config():
     return {"team_locked": bool(os.environ.get("ACCESS_CODE")),
             "instagram_ready": any(os.environ.get(k) for k in ("IG_SESSIONID", "IG_SESSION_USER", "IG_COOKIES_FROM")),
             "ai_ready": bool(os.environ.get("ANTHROPIC_API_KEY")) and os.environ.get("USE_AI", "1") != "0",
-            "free_mode": os.environ.get("USE_AI", "1") == "0", "max_posts": MAX_POSTS}
+            "free_mode": os.environ.get("USE_AI", "1") == "0", "saves_reports": store.enabled(), "max_posts": MAX_POSTS}
 
 
 @app.get("/r/{handle}")
@@ -279,6 +286,7 @@ async function loadConfig(){
   if (!cfg.team_locked && !location.hostname.match(/^(localhost|127\.0\.0\.1)$/)) miss.push('a team code (ACCESS_CODE), so anyone with the link can use this app');
   if (!cfg.instagram_ready) miss.push('an Instagram session (IG_SESSIONID)');
   if (!cfg.ai_ready && !cfg.free_mode) miss.push('a Claude API key (ANTHROPIC_API_KEY), so audits will contain metrics only');
+  if (!cfg.saves_reports && !location.hostname.match(/^(localhost|127\.0\.0\.1)$/)) miss.push('report saving (GITHUB_TOKEN), so new audits disappear when the server restarts');
   $('setup').innerHTML = miss.length ? `<div class="setup">Setup needed: ${miss.map(esc).join(' and ')}.</div>` : '';
 }
 async function loadList(){
