@@ -36,7 +36,11 @@ def run(handle, out_root="output", max_posts=100, session_user=None, cookies_fro
     if use_ai and not offline:
         from iga.profiler import generate_profile
         step("ai", "Writing the audit")
-        ai = generate_profile(data, m)
+        try:
+            ai = generate_profile(data, m)
+        except Exception as e:  # noqa: BLE001 - a failed AI step still leaves a metrics report
+            print("  ! AI audit failed, continuing with metrics only:", type(e).__name__, str(e)[:200])
+            ai = None
         if ai:
             ai_path.write_text(json.dumps(ai, indent=2, ensure_ascii=False))
     elif ai_path.exists():
