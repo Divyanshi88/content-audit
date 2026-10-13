@@ -6,3 +6,4 @@ anthropic>=1.13
 faster-whisper
 fastapi
 uvicorn
+python-multipart

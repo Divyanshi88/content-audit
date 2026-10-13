@@ -39,8 +39,11 @@ def _load_dotenv(path=Path(__file__).with_name(".env")):
 
 _load_dotenv()
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+import hashlib
+import hmac
+
+from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from iga import pipeline
@@ -53,6 +56,44 @@ STEPS = [("fetch", "Reading posts"), ("media", "Analysing reels"), ("metrics", "
          ("ai", "Writing the audit"), ("report", "Building report")]
 
 app = FastAPI(title="Content Audit")
+COOKIE = "ca_team"
+OPEN_PATHS = {"/login", "/healthz"}
+
+
+def _token(code):
+    return hmac.new(code.encode(), b"content-audit-team", hashlib.sha256).hexdigest()
+
+
+@app.middleware("http")
+async def team_only(request: Request, call_next):
+    """When ACCESS_CODE is set, every page and API needs the team code (remembered in a cookie)."""
+    code = os.environ.get("ACCESS_CODE")
+    if not code or request.url.path in OPEN_PATHS:
+        return await call_next(request)
+    if hmac.compare_digest(request.cookies.get(COOKIE, ""), _token(code)):
+        return await call_next(request)
+    if request.url.path.startswith("/api/"):
+        return JSONResponse({"detail": "Enter the team code first."}, status_code=401)
+    return RedirectResponse(f"/login?next={request.url.path}", status_code=303)
+
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(next: str = "/", error: int = 0):
+    nxt = next if next.startswith("/") and not next.startswith("//") else "/"
+    return LOGIN.replace("/*STYLE*/", STYLE).replace("__NEXT__", json.dumps(nxt)[1:-1].replace('"', "&quot;")) \
+        .replace("__ERR__", "That code isn't right. Ask your team lead for the current code." if error else "")
+
+
+@app.post("/login")
+def login(code: str = Form(""), next: str = Form("/")):
+    real = os.environ.get("ACCESS_CODE", "")
+    nxt = next if next.startswith("/") and not next.startswith("//") else "/"
+    if not real or not hmac.compare_digest(code.strip(), real):
+        return RedirectResponse(f"/login?error=1&next={nxt}", status_code=303)
+    resp = RedirectResponse(nxt, status_code=303)
+    resp.set_cookie(COOKIE, _token(real), max_age=60 * 60 * 24 * 90, httponly=True, samesite="lax",
+                    secure=os.environ.get("RENDER") is not None)
+    return resp
 jobs: dict[str, dict] = {}
 work: "queue.Queue[str]" = queue.Queue()
 
@@ -98,7 +139,6 @@ def worker():
 
 class AuditRequest(BaseModel):
     handle: str
-    code: str | None = None
 
 
 @app.post("/api/audit")
@@ -107,9 +147,6 @@ def start_audit(req: AuditRequest):
     handle = re.sub(r"^(https?://)?(www\.)?instagram\.com/", "", handle).strip("/").split("/")[0].split("?")[0]
     if not HANDLE_RE.match(handle):
         raise HTTPException(400, "Enter a valid Instagram handle, like @nike.")
-    code = os.environ.get("ACCESS_CODE")
-    if code and req.code != code:
-        raise HTTPException(403, "Wrong access code.")
     for jid, j in jobs.items():
         if j["handle"] == handle and j["status"] in ("queued", "running"):
             return {"job": jid}
@@ -142,7 +179,7 @@ def list_reports():
 
 @app.get("/api/config")
 def config():
-    return {"needs_code": bool(os.environ.get("ACCESS_CODE")),
+    return {"team_locked": bool(os.environ.get("ACCESS_CODE")),
             "instagram_ready": any(os.environ.get(k) for k in ("IG_SESSIONID", "IG_SESSION_USER", "IG_COOKIES_FROM")),
             "ai_ready": bool(os.environ.get("ANTHROPIC_API_KEY")), "max_posts": MAX_POSTS}
 
@@ -213,7 +250,6 @@ button:disabled{opacity:.5;cursor:default}button:focus-visible,.field input:focu
       <label class="field" for="handle"><span>@</span><input id="handle" name="handle" placeholder="brandname" spellcheck="false" autocapitalize="off" required></label>
       <button id="go" type="submit">Run audit</button>
     </div>
-    <div class="code row" id="codeRow" hidden><label class="field" for="code" style="padding-left:14px"><input id="code" name="code" placeholder="Access code" type="password"></label></div>
     <div class="err" id="err" role="alert"></div>
   </form>
   <div id="setup"></div>
@@ -238,8 +274,8 @@ let cfg = {};
 
 async function loadConfig(){
   cfg = await fetch('/api/config').then(r=>r.json());
-  $('codeRow').hidden = !cfg.needs_code;
   const miss = [];
+  if (!cfg.team_locked) miss.push('a team code (ACCESS_CODE), so anyone with the link can use this app');
   if (!cfg.instagram_ready) miss.push('an Instagram session (IG_SESSIONID)');
   if (!cfg.ai_ready) miss.push('a Claude API key (ANTHROPIC_API_KEY), so audits will contain metrics only');
   $('setup').innerHTML = miss.length ? `<div class="setup">Setup needed: ${miss.map(esc).join(' and ')}.</div>` : '';
@@ -283,13 +319,41 @@ $('f').addEventListener('submit', async e => {
   const handle = $('handle').value.trim().replace(/^@/, '');
   if (!handle) return;
   $('go').disabled = true;
-  const res = await fetch('/api/audit', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({handle, code:$('code').value || null})});
+  const res = await fetch('/api/audit', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({handle})});
   const body = await res.json().catch(()=>({}));
   if (!res.ok){ $('err').textContent = body.detail || 'Could not start the audit.'; $('go').disabled = false; return; }
   poll(body.job, handle.toLowerCase());
 });
 loadConfig(); loadList();
 </script></body></html>"""
+
+
+LOGIN = r"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Content Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>/*STYLE*/
+.gate{max-width:400px;padding-block:96px 40px}
+.gate h1{font-size:26px}.gate p{color:var(--ink-2);margin:10px 0 24px}
+.gate form{display:grid;gap:10px}
+.gate input{font:16px var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:14px;outline:none}
+.gate input:focus{border-color:var(--ink-3)}
+.gate button{font:500 15px var(--sans);background:var(--ink);color:var(--bg);border:0;border-radius:10px;min-height:50px;cursor:pointer}
+.gate button:focus-visible,.gate input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gate .err{color:var(--bad);font-size:14px}
+</style></head><body><div class="wrap">
+<nav class="nav"><span class="mark">Content Audit <span>/ Instagram</span></span><span>Team only</span></nav>
+<div class="gate">
+  <h1>Enter the team code</h1>
+  <p>This tool is for our team. You only need to enter the code once on each device.</p>
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="__NEXT__">
+    <label for="code" class="eyebrow" style="margin:0">Team code</label>
+    <input id="code" name="code" type="password" autocomplete="current-password" autofocus required>
+    <button type="submit">Continue</button>
+    <div class="err" role="alert">__ERR__</div>
+  </form>
+</div></div></body></html>"""
 
 
 def render_bundled_reports():
