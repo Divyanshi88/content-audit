@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.claude/
+.DS_Store
+output/*
+!output/demo_brand/
+output/demo_brand/*
+!output/demo_brand/raw.json
+!output/demo_brand/ai_profile.json

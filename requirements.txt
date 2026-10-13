@@ -1,0 +1,8 @@
+instaloader>=4.15
+browser_cookie3
+pandas
+jinja2
+anthropic>=1.13
+faster-whisper
+fastapi
+uvicorn

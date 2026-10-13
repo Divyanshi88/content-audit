@@ -1,0 +1,6 @@
+instaloader>=4.15
+pandas
+jinja2
+anthropic>=1.13
+fastapi
+uvicorn
