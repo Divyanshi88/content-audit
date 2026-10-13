@@ -1,0 +1,61 @@
+{
+  "one_line_bio": "A men's grooming D2C brand that has turned its feed into a daily meme channel: huge reel reach, but likes and comments that stay thin for a 389K account.",
+  "account_summary": "Bombay Shaving Company posts almost every day (8.4 posts a week across the last 120 posts, never more than 3 days apart), and 90% of the feed is reels. Reach is the strength: reels average 1.47M views, about 3.8× the follower count, so the algorithm is pushing them well beyond followers. Engagement is the weak spot. Average ER is 0.48%, and the median post sits at only 0.13%, because a handful of breakout reels (one at 23.5M views and 31.6K likes) carry the average. ER over the last 30 days fell to 0.20%, from 0.66% in the 30 days before.",
+  "niche": "Men's grooming: razors, trimmers, hair removal and perfumes (via @PerfumesByBSC)",
+  "target_audience_guess": "Indian men aged 18–34 who follow meme and creator culture, plus a smaller group drawn in by the founder and podcast content",
+  "brand_voice": "Irreverent and meme-first Hinglish (\"bruv\", \"bhaaiii\", \"Khul Ke Khel\"), with very short captions (54 characters on average) and almost no hashtags (0.1 per post)",
+  "content_pillars": [
+    {"pillar": "Memes and skits", "approx_share_pct": 76, "example": "Breakup ke ek din baad ke drama wala bro", "performance": "The volume engine: median 881K views but only 0.14% median ER. Lots of reach, little interaction"},
+    {"pillar": "Science ya Scam series", "approx_share_pct": 9, "example": "Does rubbing lemon on your skin really remove a tan?", "performance": "Very uneven: one episode got 59.7K likes, while the median episode sits at 0.07% ER"},
+    {"pillar": "Founder and product launches", "approx_share_pct": 3, "example": "I shaved off my beard after 16 years. Here's why (Switch 4)", "performance": "Best consistent pillar at 0.88% median ER, 6× the account median, with the most comments per post outside giveaways"},
+    {"pillar": "Podcast clips (Pehla Pehla × IVM Pop)", "approx_share_pct": 4, "example": "Daadhi hata do toh Bassi bhai ko unke dost bhi na pehchaanein", "performance": "Strong reach (median 1.84M views) and above-median ER (0.28%)"},
+    {"pillar": "Perfume giveaways", "approx_share_pct": 8, "example": "Tag a friend who deserves a fragrance upgrade", "performance": "Lowest ER (0.11%), but 216 comments each on average, mostly entries rather than conversation"}
+  ],
+  "formats_used": ["Reels (90%)", "Single images, mostly giveaways (9%)", "Carousels (1%)"],
+  "hook_analysis": "Most reels rely on a meme caption with no setup (\"Samajh aaya?\", \"Go with the Blo\") and assume the video's first second does the work. That brings reach but gives viewers no reason to like, comment or connect the reel to a product. The hooks that convert open with a personal stake or a question: \"I shaved off my beard after 16 years. Here's why\", or a Science ya Scam claim like \"Can you trust viral hacks…?\"",
+  "posting_behaviour": "Posts are very regular: daily, sometimes twice a day, mostly at 6–7 PM IST (75 of 120 posts). Sunday posts average 1.39% ER against 0.15–0.58% on other days, and the few posts at 3–4 PM (8 posts) average 1.1–2.8% ER. The 6 PM slot, where most content goes, averages only 0.25%.",
+  "what_works": [
+    "Reach: reels average 1.47M views, about 3.8× followers, so the algorithm is pushing them well beyond the follower base",
+    "Founder-led launch content (Switch 4) gets 0.88% median ER, 6× the account median",
+    "Science ya Scam can break out: one episode got 59.7K likes and 1.76M views",
+    "Celebrity podcast clips (Zakir Khan, Bassi, Munawar) reliably reach 1.8M+ views",
+    "Consistency: no gap longer than 3 days in 3+ months"
+  ],
+  "what_doesnt_work": [
+    "Engagement depth: 0.13% median ER is weak for 389K followers, and the 30-day trend fell from 0.66% to 0.20%",
+    "Meme reels with no product link get views but don't build the brand. Many could belong to any meme page",
+    "Giveaway image posts get 0.11% ER and pull the audience to @PerfumesByBSC instead of this account",
+    "Posting at 6 PM, where most content goes, is one of the weakest slots",
+    "Captions and hashtags do almost nothing: 54 characters on average and no search keywords"
+  ],
+  "gaps_and_opportunities": [
+    "Product isn't integrated into the memes. A product-in-the-punchline format would turn reach into recall",
+    "Science ya Scam has no fixed slot, episode number or series cover, so the breakout episodes don't build a following",
+    "Comments are rarely prompted in reels. Only giveaways ask for them",
+    "There are almost no carousels, though how-to and comparison carousels drive saves and shares in grooming",
+    "Founder content works but appears only during launches"
+  ],
+  "scores": {"consistency": 9, "engagement": 3, "content_quality": 6, "hooks": 5, "variety": 5, "branding": 4, "overall": 5},
+  "recommendations": [
+    {"title": "Put the product in the punchline", "why": "76% of posts are memes with 0.14% median ER and little brand recall.", "how": "Keep the meme format, but make the BSC product the twist or the payoff in the last 3 seconds."},
+    {"title": "Make Science ya Scam a weekly show", "why": "It produced the account's biggest hit (59.7K likes), but the episodes are scattered.", "how": "Run it every Sunday at 4 PM with an episode number, a fixed cover style and a \"vote: science or scam?\" comment prompt."},
+    {"title": "Move key posts to Sunday and 3–4 PM", "why": "Sunday averages 1.39% ER and 4 PM averages 2.8%, against 0.25% at 6 PM.", "how": "Shift the 2–3 best reels each week into those slots and keep 6–7 PM for lighter memes."},
+    {"title": "Founder content every month, not only at launches", "why": "Shantanu-led posts get 6× the median ER.", "how": "Run a monthly \"founder answers comments\" reel and a behind-the-product story."},
+    {"title": "Rethink giveaways", "why": "They score 0.11% ER and send followers to another account.", "how": "Run giveaways as reels on this account, with a product demo and a comment question."},
+    {"title": "Add saveable carousels", "why": "Carousels are 1% of posts, and grooming guides are what people save.", "how": "Post 1 a week, such as a \"beard style by face shape\" or \"razor vs trimmer\" comparison."}
+  ],
+  "reel_ideas": [
+    {"title": "Science ya Scam: Ep. 13", "hook_line": "Can a ₹10 kitchen hack replace your razor? We tested it", "format": "Test-and-verdict series", "why_it_fits": "Builds on the account's biggest breakout format"},
+    {"title": "Founder answers your roasts", "hook_line": "You said our razor is overpriced. Let's talk", "format": "Founder to camera", "why_it_fits": "Founder content gets 6× the median ER"},
+    {"title": "Meme with a product twist", "hook_line": "POV: your barber finds out you own a Legend365", "format": "Skit with the product as payoff", "why_it_fits": "Turns meme reach into brand recall"},
+    {"title": "Beard by face shape", "hook_line": "Round face? Stop growing this beard", "format": "Reel plus carousel pair", "why_it_fits": "Saveable, and gives a product use case"},
+    {"title": "Barber reacts", "hook_line": "Our barber rates your worst haircuts", "format": "UGC stitch", "why_it_fits": "Comment-driven, and fits the barbershop vibe"},
+    {"title": "Science or Scam? You vote", "hook_line": "Comment SCIENCE or SCAM before the reveal", "format": "Poll-style reel", "why_it_fits": "Fixes the comment gap"},
+    {"title": "Celebrity first shave", "hook_line": "What age was your first shave? (Podcast guest)", "format": "Podcast clip", "why_it_fits": "Podcast clips reliably reach 1.8M+ views"},
+    {"title": "24-hour no-shave challenge", "hook_line": "Our office stopped shaving for 30 days. Day 30:", "format": "Series", "why_it_fits": "Episodic, so people return"},
+    {"title": "Perfume blind test", "hook_line": "Strangers guess which perfume costs ₹500 vs ₹5,000", "format": "Street interview", "why_it_fits": "Replaces image giveaways with a product reel"},
+    {"title": "Grooming regrets", "hook_line": "Tell us your worst grooming mistake, and we'll fix it", "format": "Comment-reply reels", "why_it_fits": "Builds on an earlier comment-driven post"}
+  ],
+  "posting_plan": "Keep the daily rhythm, but plan it: Sunday 4 PM Science ya Scam episode; 2 product-twist memes; 1 founder or podcast clip; 1 saveable carousel; the rest light memes at 7 PM. Move giveaways into reels with a product demo.",
+  "sales_pitch_summary": "Your reels already reach far beyond your followers, averaging 1.47M views on a 389K account, but most of that reach doesn't turn into engagement or brand recall: the median post gets 0.13% ER, and the last 30 days fell to 0.20%. The formats that convert are the ones you post least: founder-led launches (6× the median), Science ya Scam, and celebrity podcast clips. We would put the product into the punchline of your memes, turn Science ya Scam into a fixed Sunday show, and move key posts into the slots where your audience responds best (Sunday, 3–4 PM)."
+}
