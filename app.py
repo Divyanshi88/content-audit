@@ -12,6 +12,9 @@ Env vars:
   IG_COOKIES_FROM     local alternative: firefox|chrome|safari, reuse that browser's instagram.com login
   IG_SESSION_USER     local alternative: username saved with `instaloader --login`
   MAX_POSTS           posts to read per account (default: 80)
+  VIDEO_ANALYSIS      1 = download reels, transcribe audio, send frames to Claude (slower; for laptops)
+
+For personal use put these in a .env file next to this script (see .env.example).
 """
 import json
 import os
@@ -22,6 +25,19 @@ import time
 import traceback
 import uuid
 from pathlib import Path
+
+
+def _load_dotenv(path=Path(__file__).with_name(".env")):
+    """Read KEY=value lines from .env (local/personal use); real env vars win."""
+    if path.exists():
+        for line in path.read_text().splitlines():
+            if "=" in line and not line.lstrip().startswith("#"):
+                k, v = line.split("=", 1)
+                if v.strip():
+                    os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+_load_dotenv()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
@@ -67,7 +83,9 @@ def worker():
             job["step"], job["detail"] = name, detail
 
         try:
+            full = os.environ.get("VIDEO_ANALYSIS") == "1"
             pipeline.run(job["handle"], DATA, max_posts=MAX_POSTS, home_url="/", step=step,
+                         videos=full, transcribe=full,
                          session_user=os.environ.get("IG_SESSION_USER"), cookies_from=os.environ.get("IG_COOKIES_FROM"))
             job["status"], job["url"] = "done", f"/r/{job['handle']}"
         except Exception as e:  # noqa: BLE001 - surface any failure to the user
