@@ -4,6 +4,8 @@ from pathlib import Path
 
 from jinja2 import Environment
 
+from iga.insights import quick_insights
+
 STYLE = r"""
 /* Layout: one 1040px reading column; sections separated by hairlines, panels only around charts and tables. */
 :root{
@@ -134,8 +136,13 @@ TEMPLATE = r"""<!doctype html>
     <div><dt>Brand voice</dt><dd>{{ ai.brand_voice }}</dd></div>
   </dl>
 </section>
-{% elif p.biography %}
-<section><p class="eyebrow">Bio</p><p class="prose">{{ p.biography }}</p></section>
+{% else %}
+<section>
+  <p class="eyebrow">Quick insights</p>
+  {% if p.biography %}<p class="prose" style="margin-bottom:14px">{{ p.biography }}</p>{% endif %}
+  <ul class="list dot">{% for x in quick %}<li>{{ x }}</li>{% endfor %}</ul>
+  <p class="prose" style="font-size:12.5px;color:var(--ink-3);margin-top:12px">Calculated from the numbers. Add a Claude API key to get the full written audit, content pillars and reel ideas.</p>
+</section>
 {% endif %}
 
 <section>
@@ -308,7 +315,7 @@ def render_html(metrics, ai, generated, has_transcripts=False, demo=False, home_
     return _tpl.render(p=metrics["profile"], s=metrics["summary"], by_type=metrics["by_type"],
                        top=metrics["top_posts"], bottom=metrics["bottom_posts"], tags=metrics["hashtags"][:18],
                        ai=ai, demo=demo, generated=generated, has_transcripts=has_transcripts, home_url=home_url,
-                       style=STYLE, compact=compact, type_var=TYPE_VAR,
+                       style=STYLE, compact=compact, type_var=TYPE_VAR, quick=[] if ai else quick_insights(metrics),
                        chart_json=json.dumps(chart, default=str).replace("</", "<\\/"))
 
 
